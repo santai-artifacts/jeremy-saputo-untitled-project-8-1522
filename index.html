@@ -169,11 +169,23 @@
         let lastY = 0;
         let rotationX = 0;
         let rotationY = 0;
+        let idleTimer = null;
+        let isIdle = true;
+        const IDLE_TIME = 2000;
+
+        function resetIdleTimer() {
+            isIdle = false;
+            clearTimeout(idleTimer);
+            idleTimer = setTimeout(() => {
+                isIdle = true;
+            }, IDLE_TIME);
+        }
 
         canvas.addEventListener('mousedown', (e) => {
             isDragging = true;
             lastX = e.clientX;
             lastY = e.clientY;
+            resetIdleTimer();
         });
 
         document.addEventListener('mousemove', (e) => {
@@ -184,10 +196,12 @@
             rotationX += dy * 0.01;
             lastX = e.clientX;
             lastY = e.clientY;
+            resetIdleTimer();
         });
 
         document.addEventListener('mouseup', () => {
             isDragging = false;
+            resetIdleTimer();
         });
 
         // Touch support
@@ -195,6 +209,7 @@
             isDragging = true;
             lastX = e.touches[0].clientX;
             lastY = e.touches[0].clientY;
+            resetIdleTimer();
         });
 
         document.addEventListener('touchmove', (e) => {
@@ -205,20 +220,31 @@
             rotationX += dy * 0.01;
             lastX = e.touches[0].clientX;
             lastY = e.touches[0].clientY;
+            resetIdleTimer();
         });
 
         document.addEventListener('touchend', () => {
             isDragging = false;
+            resetIdleTimer();
         });
 
         // Animation loop
         function animate() {
             requestAnimationFrame(animate);
+
+            // Auto-rotate when idle
+            if (isIdle && !isDragging) {
+                rotationY += 0.0005;
+            }
+
             globe.rotation.x = rotationX;
             globe.rotation.y = rotationY;
             renderer.render(scene, camera);
         }
         animate();
+
+        // Start idle timer on load
+        resetIdleTimer();
 
         // Handle window resize
         window.addEventListener('resize', () => {
