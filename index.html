@@ -18,8 +18,35 @@
     </style>
 </head>
 <body>
-    <div style="padding: 20px;">
-        <h1 style="color: #ff69b4;">Hello World</h1>
+    <div style="padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh;">
+        <h1 style="color: #ff69b4; margin-bottom: 40px;">Hello World</h1>
+        <svg width="300" height="300" viewBox="0 0 300 300" style="filter: drop-shadow(0 0 20px rgba(255, 105, 180, 0.3));">
+            <!-- Ocean -->
+            <circle cx="150" cy="150" r="140" fill="#1e90ff"/>
+
+            <!-- Continents -->
+            <!-- North America -->
+            <path d="M 80 100 L 100 95 L 110 105 L 105 120 L 85 115 Z" fill="#2ecc71"/>
+
+            <!-- South America -->
+            <path d="M 95 140 L 110 135 L 115 155 L 100 160 Z" fill="#2ecc71"/>
+
+            <!-- Europe -->
+            <path d="M 140 95 L 165 90 L 170 110 L 150 115 Z" fill="#2ecc71"/>
+
+            <!-- Africa -->
+            <path d="M 155 115 L 180 110 L 185 165 L 160 170 Z" fill="#2ecc71"/>
+
+            <!-- Asia -->
+            <path d="M 175 85 L 220 80 L 230 130 L 190 140 Z" fill="#2ecc71"/>
+
+            <!-- Australia -->
+            <path d="M 210 160 L 225 158 L 228 180 L 215 182 Z" fill="#2ecc71"/>
+
+            <!-- Clouds/Atmosphere glow -->
+            <circle cx="150" cy="150" r="145" fill="none" stroke="rgba(255, 255, 255, 0.1)" stroke-width="2"/>
+            <circle cx="150" cy="150" r="148" fill="none" stroke="rgba(255, 255, 255, 0.05)" stroke-width="3"/>
+        </svg>
     </div>
 </body>
 </html>
