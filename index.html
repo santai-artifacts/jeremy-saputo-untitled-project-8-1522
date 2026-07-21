@@ -14,7 +14,7 @@
         body {
             background: #000000;
             min-height: 100vh;
-            overflow-x: hidden;
+            overflow: hidden;
         }
 
         #stars {
@@ -28,22 +28,48 @@
         .container {
             position: relative;
             z-index: 1;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            perspective: 1200px;
+        }
+
+        h1 {
+            color: #ff69b4;
+            margin-bottom: 40px;
+            position: absolute;
+            top: 40px;
+        }
+
+        #earthContainer {
+            cursor: grab;
+            width: 400px;
+            height: 400px;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        #earthContainer:active {
+            cursor: grabbing;
         }
 
         #earth {
-            cursor: grab;
-            transition: transform 0.1s ease-out;
-        }
-
-        #earth:active {
-            cursor: grabbing;
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 40px rgba(255, 105, 180, 0.4));
+            transform-style: preserve-3d;
         }
 
         .controls {
             color: #ff69b4;
-            margin-top: 30px;
+            margin-top: 60px;
             text-align: center;
             font-size: 14px;
+            position: absolute;
+            bottom: 40px;
         }
     </style>
 </head>
@@ -67,70 +93,72 @@
             svg.appendChild(circle);
         }
     </script>
-    <div class="container" style="padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh;">
-        <h1 style="color: #ff69b4; margin-bottom: 40px;">Hello World</h1>
-        <svg id="earth" width="300" height="300" viewBox="0 0 300 300" style="filter: drop-shadow(0 0 20px rgba(255, 105, 180, 0.3)); max-width: 90vh; max-height: 90vh;">
-            <!-- Ocean -->
-            <circle cx="150" cy="150" r="140" fill="#1e90ff"/>
+    <div class="container">
+        <h1>Hello World</h1>
+        <div id="earthContainer">
+            <svg id="earth" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+                <!-- Ocean -->
+                <circle cx="150" cy="150" r="140" fill="#1e90ff"/>
 
-            <!-- Continents -->
-            <!-- North America - larger -->
-            <path d="M 65 85 L 75 75 L 95 78 L 115 90 L 118 108 L 110 125 L 95 130 L 78 122 L 68 108 Z" fill="#2ecc71"/>
-            <!-- North America - Greenland -->
-            <path d="M 85 65 L 100 60 L 108 70 L 100 78 L 88 75 Z" fill="#2ecc71"/>
+                <!-- Front side continents -->
+                <!-- North America - larger -->
+                <path d="M 65 85 L 75 75 L 95 78 L 115 90 L 118 108 L 110 125 L 95 130 L 78 122 L 68 108 Z" fill="#2ecc71"/>
+                <!-- North America - Greenland -->
+                <path d="M 85 65 L 100 60 L 108 70 L 100 78 L 88 75 Z" fill="#2ecc71"/>
 
-            <!-- South America - larger -->
-            <path d="M 90 138 L 108 130 L 120 138 L 122 158 L 115 175 L 102 178 L 90 165 L 85 150 Z" fill="#2ecc71"/>
+                <!-- South America - larger -->
+                <path d="M 90 138 L 108 130 L 120 138 L 122 158 L 115 175 L 102 178 L 90 165 L 85 150 Z" fill="#2ecc71"/>
 
-            <!-- Europe - larger -->
-            <path d="M 138 82 L 158 78 L 172 85 L 175 100 L 165 112 L 148 115 L 138 105 Z" fill="#2ecc71"/>
-            <!-- Scandinavia -->
-            <path d="M 150 65 L 160 60 L 168 70 L 162 80 L 152 78 Z" fill="#2ecc71"/>
+                <!-- Europe - larger -->
+                <path d="M 138 82 L 158 78 L 172 85 L 175 100 L 165 112 L 148 115 L 138 105 Z" fill="#2ecc71"/>
+                <!-- Scandinavia -->
+                <path d="M 150 65 L 160 60 L 168 70 L 162 80 L 152 78 Z" fill="#2ecc71"/>
 
-            <!-- Africa - larger -->
-            <path d="M 148 118 L 185 112 L 192 140 L 190 168 L 175 185 L 158 182 L 148 162 L 145 138 Z" fill="#2ecc71"/>
+                <!-- Africa - larger -->
+                <path d="M 148 118 L 185 112 L 192 140 L 190 168 L 175 185 L 158 182 L 148 162 L 145 138 Z" fill="#2ecc71"/>
 
-            <!-- Asia - larger, more detailed -->
-            <path d="M 178 72 L 225 65 L 245 80 L 248 110 L 238 132 L 210 142 L 188 138 L 178 118 L 175 92 Z" fill="#2ecc71"/>
-            <!-- India -->
-            <path d="M 200 138 L 212 135 L 215 158 L 205 165 L 198 155 Z" fill="#2ecc71"/>
-            <!-- Southeast Asia -->
-            <path d="M 228 138 L 242 132 L 248 148 L 238 155 L 228 148 Z" fill="#2ecc71"/>
+                <!-- Back side continents (Pacific side, offset by ~180 degrees) -->
+                <!-- Japan -->
+                <path d="M 245 100 L 260 95 L 265 115 L 252 120 Z" fill="#2ecc71"/>
+                <!-- Eastern Russia -->
+                <path d="M 235 78 L 255 72 L 265 85 L 248 92 Z" fill="#2ecc71"/>
+                <!-- Pacific islands suggestion -->
+                <path d="M 270 140 L 280 138 L 282 152 L 272 155 Z" fill="#2ecc71"/>
 
-            <!-- Australia - larger -->
-            <path d="M 208 158 L 232 152 L 242 162 L 238 185 L 220 190 L 208 180 Z" fill="#2ecc71"/>
-            <!-- New Zealand -->
-            <path d="M 248 178 L 254 172 L 258 182 L 252 188 Z" fill="#2ecc71"/>
-
-            <!-- Antarctica hint -->
-            <path d="M 100 258 L 130 252 L 170 250 L 200 252 L 220 258 L 200 268 L 170 270 L 130 268 Z" fill="#e8e8e8" opacity="0.6"/>
-
-            <!-- Clouds/Atmosphere glow -->
-            <circle cx="150" cy="150" r="145" fill="none" stroke="rgba(255, 255, 255, 0.1)" stroke-width="2"/>
-            <circle cx="150" cy="150" r="148" fill="none" stroke="rgba(255, 255, 255, 0.05)" stroke-width="3"/>
-        </svg>
+                <!-- Atmosphere glow -->
+                <circle cx="150" cy="150" r="145" fill="none" stroke="rgba(255, 255, 255, 0.1)" stroke-width="2"/>
+                <circle cx="150" cy="150" r="148" fill="none" stroke="rgba(255, 255, 255, 0.05)" stroke-width="3"/>
+            </svg>
+        </div>
         <div class="controls">
-            <p>Drag to rotate • Use arrow keys</p>
+            <p>Drag left/right to spin • Drag up/down to tilt</p>
         </div>
     </div>
 
     <script>
+        const container = document.getElementById('earthContainer');
         const earth = document.getElementById('earth');
-        let rotation = 0;
+        let rotationX = 0;
+        let rotationY = 0;
         let isDragging = false;
         let lastX = 0;
+        let lastY = 0;
 
         // Mouse drag
-        earth.addEventListener('mousedown', (e) => {
+        container.addEventListener('mousedown', (e) => {
             isDragging = true;
             lastX = e.clientX;
+            lastY = e.clientY;
         });
 
         document.addEventListener('mousemove', (e) => {
             if (!isDragging) return;
             const dx = e.clientX - lastX;
-            rotation += dx * 0.5;
+            const dy = e.clientY - lastY;
+            rotationY += dx * 0.8;
+            rotationX -= dy * 0.8;
             lastX = e.clientX;
+            lastY = e.clientY;
             updateRotation();
         });
 
@@ -139,16 +167,20 @@
         });
 
         // Touch drag
-        earth.addEventListener('touchstart', (e) => {
+        container.addEventListener('touchstart', (e) => {
             isDragging = true;
             lastX = e.touches[0].clientX;
+            lastY = e.touches[0].clientY;
         });
 
         document.addEventListener('touchmove', (e) => {
             if (!isDragging) return;
             const dx = e.touches[0].clientX - lastX;
-            rotation += dx * 0.5;
+            const dy = e.touches[0].clientY - lastY;
+            rotationY += dx * 0.8;
+            rotationX -= dy * 0.8;
             lastX = e.touches[0].clientX;
+            lastY = e.touches[0].clientY;
             updateRotation();
         });
 
@@ -158,13 +190,17 @@
 
         // Arrow keys
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft') rotation += 10;
-            if (e.key === 'ArrowRight') rotation -= 10;
+            if (e.key === 'ArrowLeft') rotationY += 15;
+            if (e.key === 'ArrowRight') rotationY -= 15;
+            if (e.key === 'ArrowUp') rotationX += 15;
+            if (e.key === 'ArrowDown') rotationX -= 15;
             updateRotation();
         });
 
         function updateRotation() {
-            earth.style.transform = `rotateZ(${rotation}deg)`;
+            // Clamp vertical rotation to avoid over-tilting
+            rotationX = Math.max(-85, Math.min(85, rotationX));
+            earth.style.transform = `rotateX(${rotationX}deg) rotateY(${rotationY}deg)`;
         }
     </script>
 </body>
