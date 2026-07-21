@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blank</title>
+    <title>3D Earth</title>
     <style>
         * {
             margin: 0;
@@ -15,6 +15,7 @@
             background: #000000;
             min-height: 100vh;
             overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
 
         #stars {
@@ -25,57 +26,45 @@
             z-index: 0;
         }
 
-        .container {
+        #canvas {
+            display: block;
             position: relative;
             z-index: 1;
-            width: 100%;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            perspective: 1200px;
         }
 
         h1 {
-            color: #ff69b4;
-            margin-bottom: 40px;
-            position: absolute;
+            position: fixed;
             top: 40px;
-        }
-
-        #earthContainer {
-            cursor: grab;
-            width: 400px;
-            height: 400px;
-            position: relative;
-            transform-style: preserve-3d;
-        }
-
-        #earthContainer:active {
-            cursor: grabbing;
-        }
-
-        #earth {
-            width: 100%;
-            height: 100%;
-            filter: drop-shadow(0 0 40px rgba(255, 105, 180, 0.4));
-            transform-style: preserve-3d;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #ff69b4;
+            z-index: 2;
+            font-size: 32px;
         }
 
         .controls {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
             color: #ff69b4;
-            margin-top: 60px;
             text-align: center;
             font-size: 14px;
-            position: absolute;
-            bottom: 40px;
+            z-index: 2;
         }
     </style>
 </head>
 <body>
     <svg id="stars" xmlns="http://www.w3.org/2000/svg"></svg>
+    <h1>Hello World</h1>
+    <canvas id="canvas"></canvas>
+    <div class="controls">
+        <p>Drag to rotate the globe</p>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
+        // Create stars
         const svg = document.getElementById('stars');
         const w = window.innerWidth, h = window.innerHeight;
         svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
@@ -92,60 +81,96 @@
             circle.setAttribute('opacity', op);
             svg.appendChild(circle);
         }
-    </script>
-    <div class="container">
-        <h1>Hello World</h1>
-        <div id="earthContainer">
-            <svg id="earth" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
-                <!-- Ocean -->
-                <circle cx="150" cy="150" r="140" fill="#1e90ff"/>
 
-                <!-- Front side continents -->
-                <!-- North America - larger -->
-                <path d="M 65 85 L 75 75 L 95 78 L 115 90 L 118 108 L 110 125 L 95 130 L 78 122 L 68 108 Z" fill="#2ecc71"/>
-                <!-- North America - Greenland -->
-                <path d="M 85 65 L 100 60 L 108 70 L 100 78 L 88 75 Z" fill="#2ecc71"/>
+        // Three.js setup
+        const canvas = document.getElementById('canvas');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0x000000);
+        camera.position.z = 2.5;
 
-                <!-- South America - larger -->
-                <path d="M 90 138 L 108 130 L 120 138 L 122 158 L 115 175 L 102 178 L 90 165 L 85 150 Z" fill="#2ecc71"/>
+        // Create canvas texture for Earth
+        const textureCanvas = document.createElement('canvas');
+        textureCanvas.width = 2048;
+        textureCanvas.height = 1024;
+        const ctx = textureCanvas.getContext('2d');
 
-                <!-- Europe - larger -->
-                <path d="M 138 82 L 158 78 L 172 85 L 175 100 L 165 112 L 148 115 L 138 105 Z" fill="#2ecc71"/>
-                <!-- Scandinavia -->
-                <path d="M 150 65 L 160 60 L 168 70 L 162 80 L 152 78 Z" fill="#2ecc71"/>
+        // Draw ocean
+        ctx.fillStyle = '#1e90ff';
+        ctx.fillRect(0, 0, textureCanvas.width, textureCanvas.height);
 
-                <!-- Africa - larger -->
-                <path d="M 148 118 L 185 112 L 192 140 L 190 168 L 175 185 L 158 182 L 148 162 L 145 138 Z" fill="#2ecc71"/>
+        // Draw continents
+        ctx.fillStyle = '#2ecc71';
 
-                <!-- Back side continents (Pacific side, offset by ~180 degrees) -->
-                <!-- Japan -->
-                <path d="M 245 100 L 260 95 L 265 115 L 252 120 Z" fill="#2ecc71"/>
-                <!-- Eastern Russia -->
-                <path d="M 235 78 L 255 72 L 265 85 L 248 92 Z" fill="#2ecc71"/>
-                <!-- Pacific islands suggestion -->
-                <path d="M 270 140 L 280 138 L 282 152 L 272 155 Z" fill="#2ecc71"/>
+        // Helper to draw continent
+        function drawContinent(startX, startY, points) {
+            ctx.beginPath();
+            ctx.moveTo(startX + points[0][0], startY + points[0][1]);
+            for (let i = 1; i < points.length; i++) {
+                ctx.lineTo(startX + points[i][0], startY + points[i][1]);
+            }
+            ctx.closePath();
+            ctx.fill();
+        }
 
-                <!-- Atmosphere glow -->
-                <circle cx="150" cy="150" r="145" fill="none" stroke="rgba(255, 255, 255, 0.1)" stroke-width="2"/>
-                <circle cx="150" cy="150" r="148" fill="none" stroke="rgba(255, 255, 255, 0.05)" stroke-width="3"/>
-            </svg>
-        </div>
-        <div class="controls">
-            <p>Drag left/right to spin • Drag up/down to tilt</p>
-        </div>
-    </div>
+        // North America
+        drawContinent(100, 300, [[0, 0], [40, -30], [80, -20], [100, 20], [80, 80], [40, 70], [20, 50]]);
+        drawContinent(120, 250, [[0, 0], [30, -20], [35, 20], [20, 30]]);
 
-    <script>
-        const container = document.getElementById('earthContainer');
-        const earth = document.getElementById('earth');
-        let rotationX = 0;
-        let rotationY = 0;
+        // South America
+        drawContinent(150, 480, [[0, 0], [40, -20], [50, 20], [45, 120], [20, 140], [0, 100]]);
+
+        // Europe/Africa
+        drawContinent(400, 280, [[0, 0], [60, -40], [80, 20], [70, 100], [40, 140], [20, 100], [10, 50]]);
+        drawContinent(420, 250, [[0, 0], [40, -30], [45, 10], [35, 30]]);
+
+        // Asia
+        drawContinent(550, 200, [[0, 0], [150, -50], [200, 50], [150, 150], [80, 140], [50, 80]]);
+
+        // India
+        drawContinent(680, 320, [[0, 0], [30, -10], [35, 50], [15, 60]]);
+
+        // Southeast Asia
+        drawContinent(750, 340, [[0, 0], [50, -20], [60, 40], [30, 50]]);
+
+        // Australia
+        drawContinent(850, 420, [[0, 0], [60, -40], [75, 20], [70, 100], [40, 110], [10, 70]]);
+        drawContinent(920, 380, [[0, 0], [15, -15], [18, 30], [10, 40]]);
+
+        // Back side (Pacific/Asia eastern)
+        drawContinent(1400, 280, [[0, 0], [40, -30], [50, 20], [40, 50]]);
+        drawContinent(1550, 240, [[0, 0], [80, -40], [100, 40], [70, 100]]);
+
+        // Antarctica hint
+        ctx.fillStyle = '#e8e8e8';
+        ctx.globalAlpha = 0.6;
+        drawContinent(400, 850, [[0, 0], [150, -30], [250, -20], [300, 30], [200, 80], [50, 70]]);
+        ctx.globalAlpha = 1;
+
+        const texture = new THREE.CanvasTexture(textureCanvas);
+        const geometry = new THREE.SphereGeometry(1, 64, 64);
+        const material = new THREE.MeshPhongMaterial({ map: texture });
+        const globe = new THREE.Mesh(geometry, material);
+        scene.add(globe);
+
+        // Lighting
+        const light1 = new THREE.DirectionalLight(0xffffff, 0.8);
+        light1.position.set(5, 3, 5);
+        scene.add(light1);
+
+        const light2 = new THREE.AmbientLight(0xffffff, 0.4);
+        scene.add(light2);
+
+        // Interaction
         let isDragging = false;
         let lastX = 0;
         let lastY = 0;
+        let rotationX = 0;
+        let rotationY = 0;
 
-        // Mouse drag
-        container.addEventListener('mousedown', (e) => {
+        canvas.addEventListener('mousedown', (e) => {
             isDragging = true;
             lastX = e.clientX;
             lastY = e.clientY;
@@ -155,19 +180,18 @@
             if (!isDragging) return;
             const dx = e.clientX - lastX;
             const dy = e.clientY - lastY;
-            rotationY += dx * 0.8;
-            rotationX -= dy * 0.8;
+            rotationY += dx * 0.01;
+            rotationX += dy * 0.01;
             lastX = e.clientX;
             lastY = e.clientY;
-            updateRotation();
         });
 
         document.addEventListener('mouseup', () => {
             isDragging = false;
         });
 
-        // Touch drag
-        container.addEventListener('touchstart', (e) => {
+        // Touch support
+        canvas.addEventListener('touchstart', (e) => {
             isDragging = true;
             lastX = e.touches[0].clientX;
             lastY = e.touches[0].clientY;
@@ -177,31 +201,31 @@
             if (!isDragging) return;
             const dx = e.touches[0].clientX - lastX;
             const dy = e.touches[0].clientY - lastY;
-            rotationY += dx * 0.8;
-            rotationX -= dy * 0.8;
+            rotationY += dx * 0.01;
+            rotationX += dy * 0.01;
             lastX = e.touches[0].clientX;
             lastY = e.touches[0].clientY;
-            updateRotation();
         });
 
         document.addEventListener('touchend', () => {
             isDragging = false;
         });
 
-        // Arrow keys
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft') rotationY += 15;
-            if (e.key === 'ArrowRight') rotationY -= 15;
-            if (e.key === 'ArrowUp') rotationX += 15;
-            if (e.key === 'ArrowDown') rotationX -= 15;
-            updateRotation();
-        });
-
-        function updateRotation() {
-            // Clamp vertical rotation to avoid over-tilting
-            rotationX = Math.max(-85, Math.min(85, rotationX));
-            earth.style.transform = `rotateX(${rotationX}deg) rotateY(${rotationY}deg)`;
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            globe.rotation.x = rotationX;
+            globe.rotation.y = rotationY;
+            renderer.render(scene, camera);
         }
+        animate();
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
     </script>
 </body>
 </html>
